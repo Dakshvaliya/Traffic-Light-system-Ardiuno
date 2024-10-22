@@ -16,8 +16,6 @@ const int buzzer = 12;
 
 // Timing variables (milliseconds)
 int pedestrianGreenTime = 5000; // Default 5 seconds for pedestrian
-const int yellowLightTime = 2000; // Yellow light duration
-const int greenLightTime = 5000; // Green light duration for traffic
 const unsigned long buttonCooldown = 20000; // 20-second cooldown for lights
 const unsigned long buttonWaitTime = 10000; // 10 seconds wait time
 const unsigned long buttonWaitHalfTime = 5000; // 5 seconds if both buttons are pressed
@@ -48,13 +46,13 @@ void setup() {
 void loop() {
   // Check if either button is pressed and if cooldown is not active
   if ((digitalRead(button1) == LOW || digitalRead(button2) == LOW) && !isCooldownActive) {
-    // If both buttons are pressed, halve the pedestrian green time
+    // Determine the pedestrian wait time based on button conditions
     if (digitalRead(button1) == LOW && digitalRead(button2) == LOW) {
-      pedestrianGreenTime = 2500; // Half the time for pedestrians
-      delay(buttonWaitHalfTime); // Wait for 5 seconds
+      pedestrianGreenTime = 2500; // Halve the pedestrian green time if both buttons are pressed
+      delay(buttonWaitHalfTime); // Wait for 5 seconds before changing lights
     } else {
-      pedestrianGreenTime = 5000; // Default time
-      delay(buttonWaitTime); // Wait for 10 seconds
+      pedestrianGreenTime = 5000; // Default time for one button
+      delay(buttonWaitTime); // Wait for 10 seconds before changing lights
     }
 
     // Start pedestrian crossing sequence
@@ -74,7 +72,6 @@ void loop() {
 void pedestrianCrossing() {
   // Stop traffic by switching to red light
   digitalWrite(trafficGreen, LOW);
-  digitalWrite(trafficYellow, LOW);
   digitalWrite(trafficRed, HIGH);
 
   // Turn the pedestrian red light off and green light on
@@ -96,23 +93,7 @@ void pedestrianCrossing() {
   digitalWrite(pedGreen, LOW);
   digitalWrite(pedRed, HIGH);
 
-  // Resume normal traffic light cycle with a cooldown
-  trafficLightCycle();
-}
-
-void trafficLightCycle() {
-  // Traffic light turns green
+  // Turn traffic light back to green
   digitalWrite(trafficRed, LOW);
-  digitalWrite(trafficYellow, LOW);
   digitalWrite(trafficGreen, HIGH);
-  delay(greenLightTime);
-
-  // Traffic light turns yellow
-  digitalWrite(trafficGreen, LOW);
-  digitalWrite(trafficYellow, HIGH);
-  delay(yellowLightTime);
-
-  // Traffic light turns red
-  digitalWrite(trafficYellow, LOW);
-  digitalWrite(trafficRed, HIGH);
 }
